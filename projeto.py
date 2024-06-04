@@ -37,7 +37,7 @@ def importar_usuarios():
             linhas = arquivo.readlines()
             for linha in linhas:
                 dados = linha.strip().split(",")
-                if dados[3] == "Funcionario":
+                if dados[3] == "Admin":
                     usuario = Funcionario(dados[0], dados[1], dados[2], dados[3])
                 else:
                     usuario = Cliente(dados[0], dados[1], dados[2], dados[3])
@@ -66,17 +66,12 @@ def importar_livros():
     return livros
 
 def cadastrar_usuario(usuarios):
-    tipo_usuario = input("Digite o tipo de usuário (Funcionario/Cliente/Admin): ").lower()
+    tipo_usuario = input("Digite o tipo de usuário (Cliente/Admin): ").lower()
     username = input("Digite o nome de usuário: ")
     senha = input("Digite a senha: ")
     nome = input("Digite o nome do usuário: ")
 
-    if tipo_usuario == "funcionario":
-        cargo = input("Digite o cargo (Funcionario): ")
-        usuario = Funcionario(username, senha, nome, cargo)
-        usuarios.append(usuario)
-        print("Usuário funcionário cadastrado com sucesso!\n")
-    elif tipo_usuario == "cliente":
+    if tipo_usuario == "cliente":
         email = input("Digite o e-mail do cliente: ")
         usuario = Cliente(username, senha, nome, email)
         usuarios.append(usuario)
