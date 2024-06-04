@@ -66,33 +66,55 @@ def importar_livros():
     return livros
 
 def cadastrar_usuario(usuarios):
+    tipo_usuario = input("Digite o tipo de usuário (Funcionario/Cliente/Admin): ").lower()
     username = input("Digite o nome de usuário: ")
     senha = input("Digite a senha: ")
     nome = input("Digite o nome do usuário: ")
-    cargo = input("Digite o cargo (Funcionario/Admin): ")
-    if cargo.lower() == "admin":
+
+    if tipo_usuario == "funcionario":
+        cargo = input("Digite o cargo (Funcionario): ")
+        usuario = Funcionario(username, senha, nome, cargo)
+        usuarios.append(usuario)
+        print("Usuário funcionário cadastrado com sucesso!\n")
+    elif tipo_usuario == "cliente":
+        email = input("Digite o e-mail do cliente: ")
+        usuario = Cliente(username, senha, nome, email)
+        usuarios.append(usuario)
+        print("Cliente cadastrado com sucesso!\n")
+    elif tipo_usuario == "admin":
         senha_admin = input("Digite a senha de administrador: ")
-        if senha_admin == "admin123":  # Verifica se a senha de administrador está correta
-            usuario = Funcionario(username, senha, nome, cargo)
+        if senha_admin == "admin123":
+            usuario = Funcionario(username, senha, nome, "Admin")
             usuarios.append(usuario)
-            print("Usuário cadastrado com sucesso!\n")
+            print("Usuário administrador cadastrado com sucesso!\n")
         else:
             print("Senha de administrador incorreta. Não é possível cadastrar um administrador.\n")
     else:
-        usuario = Funcionario(username, senha, nome, cargo)
-        usuarios.append(usuario)
-        print("Usuário cadastrado com sucesso!\n")
+        print("Tipo de usuário inválido. Tente novamente.\n")
 
 def login(usuarios):
-    username = input("Digite o nome de usuário: ")
-    senha = input("Digite a senha: ")
+    MAX_ATTEMPTS = 3
+    attempts = 0
 
-    for usuario in usuarios:
-        if usuario.username == username and usuario.password == senha:
-            print("Login bem-sucedido!\n")
-            return usuario
+    while attempts < MAX_ATTEMPTS:
+        username_or_email = input("Digite o nome de usuário ou e-mail: ")
+        senha = input("Digite a senha: ")
 
-    print("Nome de usuário ou senha incorretos.\n")
+        for usuario in usuarios:
+            if ((usuario.username.lower() == username_or_email.lower() or 
+                (isinstance(usuario, Cliente) and usuario.email.lower() == username_or_email.lower())) and 
+                usuario.password == senha):
+                print("Login bem-sucedido!\n")
+                return usuario
+
+        attempts += 1
+        remaining_attempts = MAX_ATTEMPTS - attempts
+        if remaining_attempts > 0:
+            print(f"Nome de usuário, e-mail ou senha incorretos. Você tem mais {remaining_attempts} tentativa(s).\n")
+        else:
+            print("Número máximo de tentativas atingido. Tente novamente mais tarde.\n")
+            return None
+
     return None
 
 def adicionar_livro(livros, usuario_logado):
@@ -120,6 +142,7 @@ def main():
     usuarios = importar_usuarios()
     clientes = []
     livros = importar_livros()
+    usuario_logado = None
 
     while True:
         print("Menu Principal")
@@ -137,7 +160,10 @@ def main():
             if usuario_logado:
                 print(f"Bem-vindo, {usuario_logado.nome}!\n")
         elif opcao == '3':
-            adicionar_livro(livros, usuario_logado)
+            if usuario_logado:
+                adicionar_livro(livros, usuario_logado)
+            else:
+                print("Você precisa estar logado para adicionar um livro.\n")
         elif opcao == '4':
             visualizar_livros(livros)
         elif opcao == '5':
