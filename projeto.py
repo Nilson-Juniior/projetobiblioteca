@@ -66,72 +66,84 @@ def importar_livros():
     return livros
 
 def cadastrar_usuario(usuarios):
-    tipo_usuario = input("Digite o tipo de usuário (Cliente/Admin): ").lower()
-    username = input("Digite o nome de usuário: ")
-    senha = input("Digite a senha: ")
-    nome = input("Digite o nome do usuário: ")
+    try:
+        tipo_usuario = input("Digite o tipo de usuário (Cliente/Admin): ").lower()
+        username = input("Digite o nome de usuário: ")
+        senha = input("Digite a senha: ")
+        nome = input("Digite o nome do usuário: ")
 
-    if tipo_usuario == "cliente":
-        email = input("Digite o e-mail do cliente: ")
-        usuario = Cliente(username, senha, nome, email)
-        usuarios.append(usuario)
-        print("Cliente cadastrado com sucesso!\n")
-    elif tipo_usuario == "admin":
-        senha_admin = input("Digite a senha de administrador: ")
-        if senha_admin == "admin123":
-            usuario = Funcionario(username, senha, nome, "Admin")
+        if tipo_usuario == "cliente":
+            email = input("Digite o e-mail do cliente: ")
+            usuario = Cliente(username, senha, nome, email)
             usuarios.append(usuario)
-            print("Usuário administrador cadastrado com sucesso!\n")
+            print("Cliente cadastrado com sucesso!\n")
+        elif tipo_usuario == "admin":
+            senha_admin = input("Digite a senha de administrador: ")
+            if senha_admin == "admin123":
+                usuario = Funcionario(username, senha, nome, "Admin")
+                usuarios.append(usuario)
+                print("Usuário administrador cadastrado com sucesso!\n")
+            else:
+                print("Senha de administrador incorreta. Não é possível cadastrar um administrador.\n")
         else:
-            print("Senha de administrador incorreta. Não é possível cadastrar um administrador.\n")
-    else:
-        print("Tipo de usuário inválido. Tente novamente.\n")
+            print("Tipo de usuário inválido. Tente novamente.\n")
+    except Exception as e:
+        print(f"Ocorreu um erro ao cadastrar usuário: {e}")
 
 def login(usuarios):
     MAX_ATTEMPTS = 3
     attempts = 0
 
     while attempts < MAX_ATTEMPTS:
-        username_or_email = input("Digite o nome de usuário ou e-mail: ")
-        senha = input("Digite a senha: ")
+        try:
+            username_or_email = input("Digite o nome de usuário ou e-mail: ")
+            senha = input("Digite a senha: ")
 
-        for usuario in usuarios:
-            if ((usuario.username.lower() == username_or_email.lower() or 
-                (isinstance(usuario, Cliente) and usuario.email.lower() == username_or_email.lower())) and 
-                usuario.password == senha):
-                print("Login bem-sucedido!\n")
-                return usuario
+            for usuario in usuarios:
+                if ((usuario.username.lower() == username_or_email.lower() or 
+                    (isinstance(usuario, Cliente) and usuario.email.lower() == username_or_email.lower())) and 
+                    usuario.password == senha):
+                    print("Login bem-sucedido!\n")
+                    return usuario
 
-        attempts += 1
-        remaining_attempts = MAX_ATTEMPTS - attempts
-        if remaining_attempts > 0:
-            print(f"Nome de usuário, e-mail ou senha incorretos. Você tem mais {remaining_attempts} tentativa(s).\n")
-        else:
-            print("Número máximo de tentativas atingido. Tente novamente mais tarde.\n")
-            return None
+            attempts += 1
+            remaining_attempts = MAX_ATTEMPTS - attempts
+            if remaining_attempts > 0:
+                print(f"Nome de usuário, e-mail ou senha incorretos. Você tem mais {remaining_attempts} tentativa(s).\n")
+            else:
+                print("Número máximo de tentativas atingido. Tente novamente mais tarde.\n")
+                return None
+        except Exception as e:
+            print(f"Ocorreu um erro durante o login: {e}")
 
     return None
 
 def adicionar_livro(livros, usuario_logado):
-    if isinstance(usuario_logado, Funcionario) and usuario_logado.cargo == "Admin":
-        titulo = input("Digite o título do livro: ")
-        autor = input("Digite o autor do livro: ")
-        ano_publicacao = input("Digite o ano de publicação do livro: ")
+    try:
+        if isinstance(usuario_logado, Funcionario) and usuario_logado.cargo == "Admin":
+            titulo = input("Digite o título do livro: ")
+            autor = input("Digite o autor do livro: ")
+            ano_publicacao = input("Digite o ano de publicação do livro: ")
 
-        livro = Livro(titulo, autor, ano_publicacao)
-        livros.append(livro)
+            livro = Livro(titulo, autor, ano_publicacao)
+            livros.append(livro)
 
-        print("Livro adicionado com sucesso!\n")
-    else:
-        print("Acesso negado. Somente administradores podem adicionar livros.\n")
+            print("Livro adicionado com sucesso!\n")
+        else:
+            print("Acesso negado. Somente administradores podem adicionar livros.\n")
+    except Exception as e:
+        print(f"Ocorreu um erro ao adicionar o livro: {e}")
 
 def visualizar_livros(livros):
-    if livros:
-        print("Lista de livros cadastrados:\n")
-        for livro in livros:
-            print(livro)
-    else:
-        print("Nenhum livro cadastrado.\n")
+    try:
+        if livros:
+            print("Lista de livros cadastrados:\n")
+            for livro in livros:
+                print(livro)
+        else:
+            print("Nenhum livro cadastrado.\n")
+    except Exception as e:
+        print(f"Ocorreu um erro ao visualizar os livros: {e}")
 
 def main():
     usuarios = importar_usuarios()
